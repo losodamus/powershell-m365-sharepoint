@@ -1,4 +1,4 @@
-# powershell-m365-sharepoint-online
+# SharePoint Online
 
 PowerShell scripts using the SPO Management Shell. Each of these helped address an immediate business need.
 
