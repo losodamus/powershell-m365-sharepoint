@@ -1,1 +1,9 @@
-# ps-m365-sharepoint-online
+# powershell-m365-sharepoint-online
+
+PowerShell scripts using the SPO Management Shell. Each of these helped address an immediate business need.
+
+> 
+> https://www.microsoft.com/en-us/download/details.aspx?id=35588
+> 
+> "The SharePoint Online Management Shell is a tool that contains a Windows PowerShell Module to manage your SharePoint Online subscription in the Office 365." - Microsoft
+> 
