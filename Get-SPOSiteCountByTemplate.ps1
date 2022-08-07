@@ -1,5 +1,5 @@
 ﻿<#
-    Get-CountOfSPOSitesByTemplate.ps1
+    Get-SPOSiteCountByTemplate.ps1
     ------------------------------
 
 
