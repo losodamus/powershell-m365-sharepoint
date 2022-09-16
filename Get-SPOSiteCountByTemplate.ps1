@@ -1,41 +1,46 @@
-﻿<#
+<#
     Get-SPOSiteCountByTemplate.ps1
     ------------------------------
 
 
-    Query SharePoint Online sites and 
-    audit site templates. 
+    Examples of template types:
+    + TEAMCHANNEL#1  - Private Channel
+    + SPSPERS#10     - OneDrive Site
 #>
 cls
 
 
+##  Variable(s)
+[System.String] $tenant = "<tenant_name>"
+[System.String] $Login = "<email_address>"
+[System.Security.SecureString] $PWord = ConvertTo-SecureString -String "<password>" -AsPlainText -Force
+[System.Collections.Hashtable] $listOf = @{}
+
+
 try {
-
-
-    ##  Variable(s)
-    [System.String] $Login = "<email_address>"
-    [System.Security.SecureString] $PWord = ConvertTo-SecureString -String "<password>" -AsPlainText -Force
-    [System.Collections.Hashtable] $listOf = @{}
-
-
     Connect-SPOService `
-        -Url https://theiilakesgroup-admin.sharepoint.com `
-        -Credential (New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Login, $PWord)
+        -Url "https://$($tenant)-admin.sharepoint.com" `
+        -Credential (New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Login, $PWord) `
+        -ErrorAction Stop
 
 
-    Get-SPOSite -IncludePersonalSite $true -Limit ALL | Select Template | % {
-        [System.String] $templateName = "$($_.Template)"
+    ##  Include OneDrive
+    Get-SPOSite -IncludePersonalSite $true -Limit ALL `
+        | Select Title, Template `
+        | Sort-Object Title | % {
 
 
-        if ($listOf.ContainsKey("$templateName") -eq $false) {
-            $listOf.Add("$templateName", 0)
+        [System.String] $tName = "$($_.Template)"
+        if (-not($listOf.ContainsKey("$tName"))) {
+            $listOf.Add("$tName", 0)
         }
-        $listOf["$templateName"]++
+        $listOf["$tName"]++
     }
     $listOf
+    $listOf = @{}
 }
 catch [Exception] {
-    Write-Host -F Red $_.Exception.Message
+    Write-Error $_.Exception.Message
 }
 finally {
     try {
