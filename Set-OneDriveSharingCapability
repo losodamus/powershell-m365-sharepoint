@@ -1,17 +1,24 @@
-﻿<#
+<#
     Set-OneDriveSharingCapability.ps1
     ------------------------------
 
 
-    Toggle the sharing capabilities of 
-    user OneDrive sites. Allow anonymous
-    sharing, guest sharing, or no guest 
-    sharing.
+    Toggle sharing capability of OneDrive sites. E.g.,
+        Anonymous
+        New And Existing Guests
+        Existing Guests
+        No Guests
 #>
 cls
 
 
-function Toggle-SharingCapability () {
+##  Variable(s)
+[System.String] $tenant = "<tenant_name>"
+[System.String] $Login = "<email_address>"
+[System.Security.SecureString] $PWord = ConvertTo-SecureString -String "<password>" -AsPlainText -Force
+
+
+function Set-OneDriveSharingCapability () {
     param(
         [Parameter(Mandatory)] 
         [ValidateNotNullOrEmpty()] 
@@ -20,13 +27,18 @@ function Toggle-SharingCapability () {
 
         [Parameter(Mandatory)] 
         [ValidateNotNullOrEmpty()] 
-        [ValidateSet('NoGuests', 'ExistingGuests', 'NewAndExistingGuests','AnyPerson')] 
+        [ValidateSet(
+            'NoGuests',
+            'ExistingGuests',
+            'NewAndExistingGuests',
+            'AnyPerson'
+        )] 
         [System.String] $PermitSharingWith
     )
 
 
-    Write-Output "$OneDriveSiteUrl"
-    Write-Output "`t- permit sharing w/ $PermitSharingWith"
+    Write-Output "$($OneDriveSiteUrl)"
+    Write-Output "`t- permit sharing w/ $($PermitSharingWith)`n"
 
 
     switch ($PermitSharingWith) {
@@ -55,26 +67,19 @@ function Toggle-SharingCapability () {
 
 
 try {
-
-
-    ##  Variable(s)
-    [System.String] $Login = "<email_address>"
-    [System.Security.SecureString] $PWord = ConvertTo-SecureString -String "<password>" -AsPlainText -Force
-
-
     Connect-SPOService `
-        -Url https://theiilakesgroup-admin.sharepoint.com `
-        -Credential (New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Login, $PWord)
+        -Url "https://$($tenant)-admin.sharepoint.com" `
+        -Credential (New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Login, $PWord) `
+        -ErrorAction Stop
 
 
     Get-SPOSite -IncludePersonalSite $true -Limit ALL `
         | ? { $_.Url -like "*/personal/*" } `
-        | Select Title, Url, SharingCapability `
-        | % {
+        | Select Title, Url, SharingCapability | % {
 
 
         ##  https://docs.microsoft.com/en-us/powershell/module/sharepoint-online/set-sposite?view=sharepoint-ps
-        Toggle-SharingCapability `
+        Set-OneDriveSharingCapability `
             -OneDriveSiteUrl "$($_.Url)" `
             -PermitSharingWith AnyPerson
     }
