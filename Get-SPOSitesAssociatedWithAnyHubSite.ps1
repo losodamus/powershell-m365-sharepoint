@@ -20,7 +20,7 @@ try {
 
     ##  Ignore OneDrive
     foreach($site in (Get-SPOSite -Limit All -IncludePersonalSite $false `
-        | ? { $_.HubSiteId -eq "00000000-0000-0000-0000-000000000000" } `
+        | ? { $_.HubSiteId -ne "00000000-0000-0000-0000-000000000000" } `
         | Select Title, Url, HubSiteId, StorageUsageCurrent `
         | Sort-Object Title )) {
 
